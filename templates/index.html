@@ -17,17 +17,22 @@
     </script>
 </head>
 <body>
+    <h1>SyllaSync</h1>
     <h2>Upload Course Syllabus</h2>
     <form action="/" method="post" enctype="multipart/form-data">
+        <label for="courseTitle">Course Title:</label>
+        <input type="text" id="courseTitle" name="courseTitle" placeholder="Enter course title here">
+        <br>
         <label for="file">Choose a syllabus file (PDF only):</label>
         <input type="file" id="file" name="file">
+        <br>
         <input type="submit" value="Upload">
     </form>
 
     <div id='calendar'></div>
     
     {% if extracted_data %}
-        <h3>Extracted Assignments and Dates:</h3>
+        <h3>{{ course_title }} - Extracted Assignments and Dates:</h3>
         <ul>
             {% for date, assignment in extracted_data %}
                 <li>{{ date.strftime("%A, %B %d, %Y") }}: {{ assignment }}</li>

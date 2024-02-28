@@ -25,13 +25,22 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def filter_unwanted_content(text):
+    # Allow only standard text characters, numbers, and common punctuation
+    allowed_chars_pattern = re.compile(r'[^a-zA-Z0-9\s,.!?;:\'\"-]+')
+
+    text_with_only_allowed_chars = re.sub(allowed_chars_pattern, '', text)
+    return text_with_only_allowed_chars
+
 def extract_text_from_pdf(pdf_path):
     text = ''
     with open(pdf_path, 'rb') as file:
         pdf_reader = PyPDF2.PdfReader(file)
         for page in pdf_reader.pages:
-            text += page.extract_text() + '\n'  
-    return text
+            text += page.extract_text() + '\n'
+    # Apply the filter to the extracted text
+    filtered_text = filter_unwanted_content(text)
+    return filtered_text
 
 def find_dates_and_assignments(text):
     # regex for MM/DD/YYYY and DD/MM/YYYY formats
@@ -65,6 +74,8 @@ def find_dates_and_assignments(text):
 def upload_file():
     global events_storage
     if request.method == 'POST':
+        course_title = request.form.get('courseTitle', 'Unknown Course')  # Default to 'Unknown Course' if not provided
+
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
@@ -87,7 +98,7 @@ def upload_file():
             for date, detail in extracted_data:
                 events_storage.append({'assignment': detail, 'date': date})
                 
-            return render_template('index.html', extracted_data=extracted_data)
+            return render_template('index.html', extracted_data=extracted_data, course_title=course_title)
             # return redirect(url_for('calendar_events'))
     
     return render_template('index.html')
