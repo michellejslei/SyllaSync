@@ -3,16 +3,14 @@ import os
 import PyPDF2
 import re
 from dateutil.parser import parse
-from datetime import datetime
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf'} 
 
 events_storage = []
 
-# Create the Flask application
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  # Configure the application to use the upload folder
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  
 app.secret_key = 'your_secret_key'
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -26,7 +24,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def filter_unwanted_content(text):
-    # Allow only standard text characters, numbers, and common punctuation
+    
     allowed_chars_pattern = re.compile(r'[^a-zA-Z0-9\s,.!?;:\'\"-]+')
 
     text_with_only_allowed_chars = re.sub(allowed_chars_pattern, '', text)
@@ -36,9 +34,10 @@ def extract_text_from_pdf(pdf_path):
     text = ''
     with open(pdf_path, 'rb') as file:
         pdf_reader = PyPDF2.PdfReader(file)
+
         for page in pdf_reader.pages:
             text += page.extract_text() + '\n'
-    # Apply the filter to the extracted text
+    
     filtered_text = filter_unwanted_content(text)
     return filtered_text
 

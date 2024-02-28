@@ -4,38 +4,42 @@
     <meta charset="UTF-8">
     <title>Upload Syllabus</title>
     <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css' rel='stylesheet' />
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.js'></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                events: '/calendar_events'
-            });
-            calendar.render();
-        });
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <h1>SyllaSync</h1>
     <h2>Upload Course Syllabus</h2>
-    <form action="/" method="post" enctype="multipart/form-data">
-        <label for="courseTitle">Course Title:</label>
-        <input type="text" id="courseTitle" name="courseTitle" placeholder="Enter course title here">
-        <br>
-        <label for="file">Choose a syllabus file (PDF only):</label>
-        <input type="file" id="file" name="file">
-        <br>
-        <input type="submit" value="Upload">
-    </form>
+    <div class="container">
+        <div class="form-container">
+            <form action="/" method="post" enctype="multipart/form-data">
+                <label for="courseTitle">Course Title:</label>
+                <input type="text" id="courseTitle" name="courseTitle" placeholder="Enter course title here">
+                <br>
+                <label for="file">Choose a syllabus file (PDF only):</label>
+                <input type="file" id="file" name="file">
+                <br>
+                <input type="submit" value="Upload">
+            </form>
+        </div>
+        <div class="diagram-container">
+            <h3>How It Works:</h3>
+            <ol class="process-diagram">
+                <li>Upload your syllabus as a PDF.</li>
+                <li>Extract all assignment and exam due dates.</li>
+                <li>Import schedule to calendar.</li>
+            </ol>
+        </div>
+    </div>
 
     <div id='calendar'></div>
     
     {% if extracted_data %}
-        <h3>{{ course_title }} - Extracted Assignments and Dates:</h3>
+        <h3>{{ course_title }} - Assignments and Dates:</h3>
         <ul>
             {% for date, assignment in extracted_data %}
-                <li>{{ date.strftime("%A, %B %d, %Y") }}: {{ assignment }}</li>
+                <!-- <li>{{ date.strftime("%A, %B %d, %Y") }}: {{ assignment }}</li> -->
+                <!-- <li>{{ date.strftime("%B %d, %Y") }}: {{ assignment }}</li> -->
+                <li><strong>{{ date.strftime("%B %d, %Y") }}</strong>: {{ assignment }}</li>
             {% endfor %}
         </ul>
     {% elif extracted_text %}
@@ -44,5 +48,19 @@
     {% else %}
         <p>No data to display. Please upload a file.</p>
     {% endif %}
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            if (calendarEl) {
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    events: '/calendar_events'
+                });
+                calendar.render();
+            }
+        });
+    </script>
 </body>
 </html>
